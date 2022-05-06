@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block body %}
+<div id="error"></div>
     <h2>{{ request.user.email }}</h2>
 
     <button class="btn btn-sm btn-outline-primary" id="inbox">Inbox</button>
@@ -18,7 +19,8 @@
         <h3 id="subject"><h3> 
         <h5 id="sender"></h5> 
         <h5 id="recipients"></h5> 
-        <p id="body" style="border: 1px solid black;"></p> 
+        <textarea id="body" style="width:100%;" readonly></textarea>
+        <!---<p id="body" style="border: 1px solid black;"></p> --->
         <div class="btn-group" role="group" aria-label="Basic mixed styles example">
             <button id="archive-button" type="button" class="btn btn-warning" style="display: none;">Archivate</button>
             <button id="reply-button" type="button" class="btn btn-success" style="display: none;">Reply</button>
@@ -26,6 +28,8 @@
     </div>
 
     <div id="compose-view">
+        <div id="alert" class="alert alert-danger" role="alert">
+          </div>
         <h3>New Email</h3>
         <form id="compose-form">
             <div class="form-group">

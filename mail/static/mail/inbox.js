@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
-  document.querySelector('#compose').addEventListener('click', compose_email());
+  document.querySelector('#compose').addEventListener('click', () => compose_email());
 
  
   // By default, load the inbox
@@ -18,17 +18,13 @@ function compose_email() {
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#email-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+  let alert = document.querySelector('#alert')
+  alert.style.display = 'none';
 
   // Clear out composition fields
     document.querySelector('#compose-recipients').value = '';
     document.querySelector('#compose-subject').value = '';
     document.querySelector('#compose-body').value = '';
-  
-  //else if (type === "reply") {
-    //document.querySelector('#compose-recipients').value = email.sender;
-    //document.querySelector('#compose-subject').value = email.subject;
-    //document.querySelector('#compose-body').value = `On ${email.timestamp} ${email.sender} wrote: ${email.body}`;
-  //}
   
   document.querySelector('#compose-form').onsubmit = function() {
     fetch('/emails', {
@@ -41,15 +37,14 @@ function compose_email() {
     })
     .then(response => response.json())
     .then(result => {
-        // Print result
-        console.log(result);
+        if (result.error){
+          alert.style.display = 'block';
+          alert.innerHTML = result.error;
+        }
+        else{
+          load_mailbox("sent");
+        }
     })
-    .catch(error => {
-      console.log('Error:', error);
-    });
-    
-    load_mailbox("sent")
-
     return false;
   }
 }
@@ -78,10 +73,15 @@ function load_mailbox(mailbox) {
       if (emails[i].read === true && mailbox === "inbox") {
         div.style.backgroundColor = "gray";
       }
+      if (mailbox === "inbox"){
+        div.innerHTML = `<h3>From ${emails[i].sender}: ${emails[i].subject}<h3>\
+        <p><small>${emails[i].timestamp}</small></p>`
+      }
+      else if (mailbox === "sent") {
+        div.innerHTML = `<h3>To ${emails[i].recipients}: ${emails[i].subject}<h3>\
+        <p><small>${emails[i].timestamp}</small></p>`
+      }
 
-      div.innerHTML = `<h3>${emails[i].sender}: ${emails[i].subject}<h3>\
-      <p><small>${emails[i].timestamp}</small></p>`
-      
       anchor.append(div);
       anchor.onclick = function() {
         fetch(`/emails/${emails[i].id}`)
@@ -118,7 +118,7 @@ function load_email(email, type) {
     else {
       document.querySelector('#compose-subject').value = `Re: ${email.subject}`;
     }
-    document.querySelector('#compose-body').value = `On ${email.timestamp} ${email.sender} wrote: ${email.body}/n`;
+    document.querySelector('#compose-body').value = `\n\n>>On ${email.timestamp} ${email.sender} wrote: ${email.body}\n`;
   }
 
   document.querySelector('#archive-button').onclick = function() {
