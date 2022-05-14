@@ -73,7 +73,7 @@ function load_mailbox(mailbox) {
       if (emails[i].read === true && mailbox === "inbox") {
         div.style.backgroundColor = "gray";
       }
-      if (mailbox === "inbox"){
+      if (mailbox === "inbox" || mailbox === "archive"){
         div.innerHTML = `<h3>From ${emails[i].sender}: ${emails[i].subject}<h3>\
         <p><small>${emails[i].timestamp}</small></p>`
       }
@@ -95,8 +95,6 @@ function load_mailbox(mailbox) {
   });
 }
 
-function send_mail() {
-}
 
 function load_email(email, type) {
   document.querySelector('#emails-view').style.display = 'none';
